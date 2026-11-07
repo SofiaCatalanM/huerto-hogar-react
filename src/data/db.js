@@ -1,5 +1,6 @@
-// Base de datos simulada temporal
+// BASE DE DATOS SIMULADA - HuertoHogar
 
+// Datos de ejemplo
 let usuarios = [
   {
     id: 1,
@@ -45,10 +46,25 @@ let productos = [
     stock: 15,
     stockCritico: 20,
     imagen: 'https://via.placeholder.com/150'
+  },
+  {
+    id: 3,
+    codigo: 'LT001',
+    nombre: 'Leche Entera',
+    categoria: 'Lácteos',
+    precio: 1500,
+    stock: 50,
+    stockCritico: 10,
+    imagen: 'https://via.placeholder.com/150'
   }
 ];
 
-let categorias = ['Frutas', 'Verduras', 'Lácteos', 'Orgánicos'];
+let categorias = [
+  { id: 1, nombre: 'Frutas' },
+  { id: 2, nombre: 'Verduras' },
+  { id: 3, nombre: 'Lácteos' },
+  { id: 4, nombre: 'Orgánicos' }
+];
 
 let ordenes = [
   {
@@ -64,13 +80,19 @@ let ordenes = [
   }
 ];
 
-// Funciones CRUD para Usuarios
+
+// FUNCIONES CRUD PARA USUARIOS
+
+
 export const obtenerUsuarios = () => [...usuarios];
 
 export const obtenerUsuarioPorId = (id) => usuarios.find(u => u.id === id);
 
 export const crearUsuario = (usuario) => {
-  const nuevoUsuario = { ...usuario, id: usuarios.length + 1 };
+  const nuevoUsuario = { 
+    ...usuario, 
+    id: usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1 
+  };
   usuarios.push(nuevoUsuario);
   return nuevoUsuario;
 };
@@ -88,48 +110,10 @@ export const eliminarUsuario = (id) => {
   usuarios = usuarios.filter(u => u.id !== id);
 };
 
-// Funciones CRUD para Productos
-export const obtenerProductos = () => [...productos];
 
-export const obtenerProductoPorId = (id) => productos.find(p => p.id === id);
+// FUNCIONES DE AUTENTICACIÓN
 
-export const crearProducto = (producto) => {
-  const nuevoProducto = { ...producto, id: productos.length + 1 };
-  productos.push(nuevoProducto);
-  return nuevoProducto;
-};
 
-export const actualizarProducto = (id, datosActualizados) => {
-  const index = productos.findIndex(p => p.id === id);
-  if (index !== -1) {
-    productos[index] = { ...productos[index], ...datosActualizados };
-    return productos[index];
-  }
-  return null;
-};
-
-export const eliminarProducto = (id) => {
-  productos = productos.filter(p => p.id !== id);
-};
-
-// Funciones para Categorías
-export const obtenerCategorias = () => [...categorias];
-
-export const crearCategoria = (categoria) => {
-  if (!categorias.includes(categoria)) {
-    categorias.push(categoria);
-    return true;
-  }
-  return false;
-};
-
-// Funciones para Órdenes
-export const obtenerOrdenes = () => [...ordenes];
-
-export const obtenerOrdenesPorUsuario = (usuarioId) => 
-  ordenes.filter(o => o.usuarioId === usuarioId);
-
-// Función de autenticación
 export const login = (email, password) => {
   const usuario = usuarios.find(u => u.email === email && u.password === password);
   return usuario || null;
@@ -140,3 +124,75 @@ export const register = (datosUsuario) => {
   if (existe) return null;
   return crearUsuario({ ...datosUsuario, tipo: 'cliente' });
 };
+
+
+// FUNCIONES CRUD PARA PRODUCTOS
+
+export const obtenerProductos = () => [...productos];
+
+export const obtenerProductoPorId = (id) => productos.find(p => p.id === id);
+
+export const crearProducto = (producto) => {
+  const nuevoProducto = { 
+    ...producto, 
+    id: productos.length > 0 ? Math.max(...productos.map(p => p.id)) + 1 : 1,
+    precio: parseFloat(producto.precio),
+    stock: parseInt(producto.stock),
+    stockCritico: parseInt(producto.stockCritico)
+  };
+  productos.push(nuevoProducto);
+  return nuevoProducto;
+};
+
+export const actualizarProducto = (id, datosActualizados) => {
+  const index = productos.findIndex(p => p.id === id);
+  if (index !== -1) {
+    productos[index] = { 
+      ...productos[index], 
+      ...datosActualizados,
+      precio: parseFloat(datosActualizados.precio),
+      stock: parseInt(datosActualizados.stock),
+      stockCritico: parseInt(datosActualizados.stockCritico)
+    };
+    return productos[index];
+  }
+  return null;
+};
+
+export const eliminarProducto = (id) => {
+  productos = productos.filter(p => p.id !== id);
+};
+
+
+// FUNCIONES CRUD PARA CATEGORÍAS
+
+export const obtenerCategorias = () => [...categorias];
+
+export const crearCategoria = (categoria) => {
+  const nuevaCategoria = { 
+    id: categorias.length > 0 ? Math.max(...categorias.map(c => c.id)) + 1 : 1,
+    nombre: categoria.nombre.trim()
+  };
+  categorias.push(nuevaCategoria);
+  return nuevaCategoria;
+};
+
+export const actualizarCategoria = (id, datosActualizados) => {
+  const index = categorias.findIndex(c => c.id === id);
+  if (index !== -1) {
+    categorias[index] = { ...categorias[index], ...datosActualizados };
+    return categorias[index];
+  }
+  return null;
+};
+
+export const eliminarCategoria = (id) => {
+  categorias = categorias.filter(c => c.id !== id);
+};
+
+
+// FUNCIONES PARA ÓRDENES
+export const obtenerOrdenes = () => [...ordenes];
+
+export const obtenerOrdenesPorUsuario = (usuarioId) => 
+  ordenes.filter(o => o.usuarioId === usuarioId);
