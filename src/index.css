@@ -109,3 +109,31 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Mejorar legibilidad de formularios en modales */
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+  background-color: #ffffff !important;
+  color: #2d3748 !important;
+  border: 1px solid #ced4da !important;
+}
+
+.modal-body input:focus,
+.modal-body select:focus,
+.modal-body textarea:focus {
+  background-color: #ffffff !important;
+  color: #2d3748 !important;
+  border-color: #1e3a5f !important;
+  box-shadow: 0 0 0 0.2rem rgba(30, 58, 95, 0.25) !important;
+}
+
+.modal-body input::placeholder {
+  color: #6c757d !important;
+  opacity: 1 !important;
+}
+
+.modal-body label {
+  color: #2d3748 !important;
+  font-weight: 600;
+}

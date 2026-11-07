@@ -1,34 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
-import { obtenerUsuarios, eliminarUsuario } from '../../data/db';
+import UserForm from '../../components/admin/UserForm';
+import { obtenerUsuarios, crearUsuario, actualizarUsuario, eliminarUsuario } from '../../data/db';
 
 function Users() {
   const [usuarios, setUsuarios] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [usuarioEdicion, setUsuarioEdicion] = useState(null);
 
-  // Cargar usuarios al montar el componente
   useEffect(() => {
-    const datos = obtenerUsuarios();
-    setUsuarios(datos);
+    cargarUsuarios();
   }, []);
 
-  // Función para manejar la eliminación
+  const cargarUsuarios = () => {
+    const datos = obtenerUsuarios();
+    setUsuarios(datos);
+  };
+
+  const handleAbrirModalNuevo = () => {
+    setUsuarioEdicion(null);
+    setMostrarModal(true);
+  };
+
+  const handleAbrirModalEdicion = (usuario) => {
+    setUsuarioEdicion(usuario);
+    setMostrarModal(true);
+  };
+
+  const handleCerrarModal = () => {
+    setMostrarModal(false);
+    setUsuarioEdicion(null);
+  };
+
+  const handleGuardarUsuario = (datosUsuario) => {
+    if (usuarioEdicion) {
+      actualizarUsuario(usuarioEdicion.id, datosUsuario);
+    } else {
+      crearUsuario(datosUsuario);
+    }
+    
+    cargarUsuarios();
+    handleCerrarModal();
+  };
+
   const handleEliminar = (id) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
       eliminarUsuario(id);
-      // Actualizar el estado local para reflejar el cambio en la UI
-      setUsuarios(obtenerUsuarios());
+      cargarUsuarios();
     }
   };
 
   return (
     <AdminLayout>
+      {/* Contenido principal de la página */}
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 className="h2">Gestión de Usuarios</h1>
         <div className="btn-toolbar mb-2 mb-md-0">
-          <button type="button" className="btn btn-sm btn-outline-primary">
-            Exportar a CSV
-          </button>
-          <button type="button" className="btn btn-sm btn-success ms-2">
+          <button 
+            type="button" 
+            className="btn btn-sm btn-success"
+            onClick={handleAbrirModalNuevo}
+          >
             + Nuevo Usuario
           </button>
         </div>
@@ -60,7 +92,12 @@ function Users() {
                   </td>
                   <td>{usuario.comuna}</td>
                   <td className="text-end">
-                    <button className="btn btn-sm btn-warning me-2">Editar</button>
+                    <button 
+                      className="btn btn-sm btn-warning me-2" 
+                      onClick={() => handleAbrirModalEdicion(usuario)}
+                    >
+                      Editar
+                    </button>
                     <button 
                       className="btn btn-sm btn-danger" 
                       onClick={() => handleEliminar(usuario.id)}
@@ -78,6 +115,45 @@ function Users() {
           </tbody>
         </table>
       </div>
+
+      {/* MODAL - Debe estar AQUÍ, como overlay, NO dentro de otro AdminLayout */}
+      {mostrarModal && (
+        <div 
+          className="modal fade show d-block" 
+          tabIndex="-1" 
+          style={{ 
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1050
+          }}
+        >
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {usuarioEdicion ? 'Editar Usuario' : 'Nuevo Usuario'}
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={handleCerrarModal}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <UserForm 
+                  usuario={usuarioEdicion} 
+                  onGuardar={handleGuardarUsuario} 
+                  onCancelar={handleCerrarModal} 
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
