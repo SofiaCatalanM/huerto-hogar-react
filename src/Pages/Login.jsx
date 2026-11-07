@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; 
 import { login } from '../data/db';
 
 function Login() {
@@ -77,9 +77,9 @@ function Login() {
               <div className="mt-3 text-center">
                 <p className="mb-0">
                   ¿No tienes cuenta?{' '}
-                  <a href="/register" className="text-success">
+                  <Link to="/registro" className="text-success">
                     Regístrate aquí
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
