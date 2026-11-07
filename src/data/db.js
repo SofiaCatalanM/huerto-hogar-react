@@ -70,19 +70,41 @@ let ordenes = [
   {
     id: 1,
     usuarioId: 1,
+    usuarioNombre: 'Juan Pérez',
     fecha: '2024-11-07',
     total: 15400,
     estado: 'pendiente',
     productos: [
-      { productoId: 1, cantidad: 5, subtotal: 6000 },
-      { productoId: 2, cantidad: 10, subtotal: 9000 }
+      { nombre: 'Manzanas Fuji', cantidad: 5, subtotal: 6000 },
+      { nombre: 'Zanahorias Orgánicas', cantidad: 10, subtotal: 9000 }
+    ]
+  },
+  {
+    id: 2,
+    usuarioId: 2,
+    usuarioNombre: 'María González',
+    fecha: '2024-11-08',
+    total: 3000,
+    estado: 'entregado',
+    productos: [
+      { nombre: 'Leche Entera', cantidad: 2, subtotal: 3000 }
+    ]
+  },
+  {
+    id: 3,
+    usuarioId: 1,
+    usuarioNombre: 'Juan Pérez',
+    fecha: '2024-11-09',
+    total: 1200,
+    estado: 'cancelado',
+    productos: [
+      { nombre: 'Manzanas Fuji', cantidad: 1, subtotal: 1200 }
     ]
   }
 ];
 
 
 // FUNCIONES CRUD PARA USUARIOS
-
 
 export const obtenerUsuarios = () => [...usuarios];
 
