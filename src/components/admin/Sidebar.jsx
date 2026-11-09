@@ -54,9 +54,19 @@ function Sidebar() {
           <strong>Administrador</strong>
         </a>
         <ul className="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-          <li><a className="dropdown-item" href="/admin/perfil">Configuración</a></li>
+          <li><Link className="dropdown-item" to="/admin/perfil">Configuración</Link></li>
           <li><hr className="dropdown-divider" /></li>
-          <li><a className="dropdown-item text-danger" href="/login">Cerrar Sesión</a></li>
+          <li>
+            <button 
+              className="dropdown-item text-danger w-100 text-start border-0 bg-transparent" 
+              onClick={() => {
+                localStorage.removeItem('usuarioActual');
+                window.location.href = '/login';
+              }}
+            >
+              Cerrar Sesión
+            </button>
+          </li>
         </ul>
       </div>
     </div>

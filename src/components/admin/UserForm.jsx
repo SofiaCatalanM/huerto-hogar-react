@@ -20,7 +20,7 @@ function UserForm({ usuario, onGuardar, onCancelar }) {
     if (usuario) {
       setFormData({
         ...usuario,
-        password: '' // No mostramos la contraseña actual
+        password: '' 
       });
     } else {
       setFormData(initialState);
@@ -28,23 +28,22 @@ function UserForm({ usuario, onGuardar, onCancelar }) {
     setErrores({});
   }, [usuario]);
 
-  // Validación de RUT chileno
+ 
+  // Validación de RUT 
   const validarRUT = (rut) => {
-    // Eliminar puntos y guión
+    // Eliminar puntos y guión para validar largo
     const rutLimpio = rut.replace(/\./g, '').replace('-', '');
     
-    // Verificar largo (mínimo 7, máximo 9 caracteres sin DV)
     if (rutLimpio.length < 7 || rutLimpio.length > 9) {
       return { valido: false, mensaje: 'RUT debe tener entre 7 y 9 dígitos' };
     }
 
-    // Verificar que tenga DV (dígito verificador)
     if (!rut.includes('-')) {
       return { valido: false, mensaje: 'RUT debe incluir guión y dígito verificador (ej: 12.345.678-9)' };
     }
 
-    // Verificar formato con regex
-    const rutRegex = /^(\d{1,2})(\d{3})(\d{3})-[\dkK]$/;
+    // Regex corregida para aceptar el formato con puntos: 12.345.678-9
+    const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/;
     if (!rutRegex.test(rut)) {
       return { valido: false, mensaje: 'Formato de RUT inválido. Use: 12.345.678-9' };
     }
