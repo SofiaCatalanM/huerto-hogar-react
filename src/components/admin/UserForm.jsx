@@ -42,7 +42,7 @@ function UserForm({ usuario, onGuardar, onCancelar }) {
       return { valido: false, mensaje: 'RUT debe incluir guión y dígito verificador (ej: 12.345.678-9)' };
     }
 
-    // Regex corregida para aceptar el formato con puntos: 12.345.678-9
+    
     const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/;
     if (!rutRegex.test(rut)) {
       return { valido: false, mensaje: 'Formato de RUT inválido. Use: 12.345.678-9' };
@@ -129,13 +129,13 @@ function UserForm({ usuario, onGuardar, onCancelar }) {
       nuevosErrores.password = 'Contraseña no puede exceder 50 caracteres';
     }
 
-    // Validar Dirección (5-100 caracteres)
+    // Validar Dirección 
     const validacionDireccion = validarTexto(formData.direccion, 'Dirección', 5, 100);
     if (!validacionDireccion.valido) {
       nuevosErrores.direccion = validacionDireccion.mensaje;
     }
 
-    // Validar Comuna (3-50 caracteres)
+    // Validar Comuna 
     const validacionComuna = validarTexto(formData.comuna, 'Comuna', 3, 50);
     if (!validacionComuna.valido) {
       nuevosErrores.comuna = validacionComuna.mensaje;
@@ -151,7 +151,7 @@ function UserForm({ usuario, onGuardar, onCancelar }) {
     if (validarFormulario()) {
       onGuardar(formData);
     } else {
-      // Scroll al primer error
+      
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
