@@ -31,6 +31,9 @@ function Login() {
     if (validarFormulario()) {
       const usuario = login(email, password);
       
+      // LINEA DE DEPURACION: Revisa la consola del navegador (F12) al hacer clic
+      console.log("Resultado del login:", usuario);
+
       if (usuario) {
         localStorage.setItem('usuarioActual', JSON.stringify(usuario));
         if (usuario.tipo === 'administrador') {

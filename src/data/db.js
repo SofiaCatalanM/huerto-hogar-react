@@ -1,7 +1,7 @@
-// BASE DE DATOS SIMULADA - HuertoHogar
+// BASE DE DATOS SIMULADA CON PERSISTENCIA - HuertoHogar
 
-// Datos de ejemplo
-let usuarios = [
+// Datos iniciales por defecto
+const usuariosPorDefecto = [
   {
     id: 1,
     rut: '12.345.678-9',
@@ -26,37 +26,13 @@ let usuarios = [
   }
 ];
 
+// Cargar usuarios desde localStorage o usar los por defecto
+let usuarios = JSON.parse(localStorage.getItem('db_usuarios')) || usuariosPorDefecto;
+
 let productos = [
-  {
-    id: 1,
-    codigo: 'FR001',
-    nombre: 'Manzanas Fuji',
-    categoria: 'Frutas',
-    precio: 1200,
-    stock: 150,
-    stockCritico: 20,
-    imagen: 'https://via.placeholder.com/150'
-  },
-  {
-    id: 2,
-    codigo: 'VR001',
-    nombre: 'Zanahorias Orgánicas',
-    categoria: 'Verduras',
-    precio: 900,
-    stock: 15,
-    stockCritico: 20,
-    imagen: 'https://via.placeholder.com/150'
-  },
-  {
-    id: 3,
-    codigo: 'LT001',
-    nombre: 'Leche Entera',
-    categoria: 'Lácteos',
-    precio: 1500,
-    stock: 50,
-    stockCritico: 10,
-    imagen: 'https://via.placeholder.com/150'
-  }
+  { id: 1, codigo: 'FR001', nombre: 'Manzanas Fuji', categoria: 'Frutas', precio: 1200, stock: 150, stockCritico: 20, imagen: 'https://via.placeholder.com/150' },
+  { id: 2, codigo: 'VR001', nombre: 'Zanahorias Orgánicas', categoria: 'Verduras', precio: 900, stock: 15, stockCritico: 20, imagen: 'https://via.placeholder.com/150' },
+  { id: 3, codigo: 'LT001', nombre: 'Leche Entera', categoria: 'Lácteos', precio: 1500, stock: 50, stockCritico: 10, imagen: 'https://via.placeholder.com/150' }
 ];
 
 let categorias = [
@@ -68,40 +44,19 @@ let categorias = [
 
 let ordenes = [
   {
-    id: 1,
-    usuarioId: 1,
-    usuarioNombre: 'Juan Pérez',
-    fecha: '2024-11-07',
-    total: 15400,
-    estado: 'pendiente',
-    productos: [
-      { nombre: 'Manzanas Fuji', cantidad: 5, subtotal: 6000 },
-      { nombre: 'Zanahorias Orgánicas', cantidad: 10, subtotal: 9000 }
-    ]
+    id: 1, usuarioId: 1, usuarioNombre: 'Juan Pérez', fecha: '2024-11-07', total: 15400, estado: 'pendiente',
+    productos: [{ nombre: 'Manzanas Fuji', cantidad: 5, subtotal: 6000 }, { nombre: 'Zanahorias Orgánicas', cantidad: 10, subtotal: 9000 }]
   },
   {
-    id: 2,
-    usuarioId: 2,
-    usuarioNombre: 'María González',
-    fecha: '2024-11-08',
-    total: 3000,
-    estado: 'entregado',
-    productos: [
-      { nombre: 'Leche Entera', cantidad: 2, subtotal: 3000 }
-    ]
-  },
-  {
-    id: 3,
-    usuarioId: 1,
-    usuarioNombre: 'Juan Pérez',
-    fecha: '2024-11-09',
-    total: 1200,
-    estado: 'cancelado',
-    productos: [
-      { nombre: 'Manzanas Fuji', cantidad: 1, subtotal: 1200 }
-    ]
+    id: 2, usuarioId: 2, usuarioNombre: 'María González', fecha: '2024-11-08', total: 3000, estado: 'entregado',
+    productos: [{ nombre: 'Leche Entera', cantidad: 2, subtotal: 3000 }]
   }
 ];
+
+// Función para guardar usuarios en localStorage
+const guardarUsuarios = () => {
+  localStorage.setItem('db_usuarios', JSON.stringify(usuarios));
+};
 
 
 // FUNCIONES CRUD PARA USUARIOS
@@ -116,6 +71,7 @@ export const crearUsuario = (usuario) => {
     id: usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1 
   };
   usuarios.push(nuevoUsuario);
+  guardarUsuarios(); // <-- PERSISTENCIA
   return nuevoUsuario;
 };
 
@@ -123,6 +79,7 @@ export const actualizarUsuario = (id, datosActualizados) => {
   const index = usuarios.findIndex(u => u.id === id);
   if (index !== -1) {
     usuarios[index] = { ...usuarios[index], ...datosActualizados };
+    guardarUsuarios(); // <-- PERSISTENCIA
     return usuarios[index];
   }
   return null;
@@ -130,11 +87,11 @@ export const actualizarUsuario = (id, datosActualizados) => {
 
 export const eliminarUsuario = (id) => {
   usuarios = usuarios.filter(u => u.id !== id);
+  guardarUsuarios(); // <-- PERSISTENCIA
 };
 
 
 // FUNCIONES DE AUTENTICACIÓN
-
 
 export const login = (email, password) => {
   const usuario = usuarios.find(u => u.email === email && u.password === password);
@@ -151,7 +108,6 @@ export const register = (datosUsuario) => {
 // FUNCIONES CRUD PARA PRODUCTOS
 
 export const obtenerProductos = () => [...productos];
-
 export const obtenerProductoPorId = (id) => productos.find(p => p.id === id);
 
 export const crearProducto = (producto) => {
@@ -212,9 +168,7 @@ export const eliminarCategoria = (id) => {
   categorias = categorias.filter(c => c.id !== id);
 };
 
-
 // FUNCIONES PARA ÓRDENES
-export const obtenerOrdenes = () => [...ordenes];
 
-export const obtenerOrdenesPorUsuario = (usuarioId) => 
-  ordenes.filter(o => o.usuarioId === usuarioId);
+export const obtenerOrdenes = () => [...ordenes];
+export const obtenerOrdenesPorUsuario = (usuarioId) => ordenes.filter(o => o.usuarioId === usuarioId);
