@@ -1,0 +1,37 @@
+
+.sidebar-admin {
+  background-color: var(--emerald-green) !important;
+}
+
+.sidebar-admin .nav-link {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.sidebar-admin .nav-link.active,
+.sidebar-admin .nav-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 5px;
+}
+
+
+.btn-huerto {
+  background-color: var(--emerald-green) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.btn-huerto:hover {
+  background-color: #246b43 !important; 
+  color: #ffffff !important;
+}
+
+
+.modal-header {
+  background-color: var(--emerald-green) !important;
+  color: #ffffff !important;
+}
+
+.modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%); 
+}

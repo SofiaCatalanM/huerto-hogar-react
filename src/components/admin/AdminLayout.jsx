@@ -1,5 +1,6 @@
 import React from 'react';
 import Sidebar from '../admin/Sidebar';
+import './admin-theme.css'; 
 
 function AdminLayout({ children }) {
   return (
