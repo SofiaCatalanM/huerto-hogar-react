@@ -116,7 +116,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
         
-        {/* Rutas Protegidas del Panel de Administración (Tu parte) */}
+        
         <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/admin/usuarios" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/admin/productos" element={<ProtectedRoute><Productos /></ProtectedRoute>} />

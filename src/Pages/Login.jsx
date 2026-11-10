@@ -50,7 +50,7 @@ function Login() {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card shadow">
-            <div className="card-header bg-primary text-white">
+            <div className="card-header text-white" style={{ backgroundColor: '#2d6a4f' }}>
               <h3 className="mb-0">Iniciar Sesion</h3>
             </div>
             <div className="card-body">

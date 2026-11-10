@@ -1,8 +1,20 @@
+/* ==========================================
+   Paleta de Colores Corporativa - Huerto Hogar
+   ========================================== */
+:root {
+  --huerto-primary: #2d6a4f;      /* Verde bosque / principal */
+  --huerto-secondary: #52b788;    /* Verde claro / secundario */
+  --huerto-accent: #d8f3dc;       /* Verde suave / fondos de alerta */
+  --huerto-dark: #1b4332;         /* Verde oscuro para textos o navbar */
+  --huerto-light: #f4f6f4;        /* Fondo general suave */
+}
+
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: #f8f9fa;
+  background-color: var(--huerto-light) !important;
+  color: #212529 !important;
 }
 
 h1,
@@ -57,10 +69,50 @@ code {
   background: var(--code-bg);
 }
 
-/* Mejorar legibilidad de formularios en modales */
+/* Tarjetas y contenedores principales */
+.card, .admin-container, .catalog-container {
+  background-color: #ffffff;
+  border-color: #dee2e6;
+}
+
+/* Botones principales adaptados al verde de Huerto Hogar */
+.btn-primary, 
+.bg-primary {
+  background-color: var(--huerto-primary) !important;
+  border-color: var(--huerto-primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--huerto-dark) !important;
+  border-color: var(--huerto-dark) !important;
+}
+
+
+.btn-outline-primary {
+  color: var(--huerto-primary) !important;
+  border-color: var(--huerto-primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--huerto-primary) !important;
+  color: #ffffff !important;
+}
+
+
+a, .text-primary {
+  color: var(--huerto-primary) !important;
+}
+
+
+.navbar.bg-dark {
+  background-color: var(--huerto-dark) !important;
+}
+
+
 .modal-body input,
 .modal-body select,
-.modal-body textarea {
+.modal-body textarea,
+.form-control {
   background-color: #ffffff !important;
   color: #2d3748 !important;
   border: 1px solid #ced4da !important;
@@ -68,11 +120,12 @@ code {
 
 .modal-body input:focus,
 .modal-body select:focus,
-.modal-body textarea:focus {
+.modal-body textarea:focus,
+.form-control:focus {
   background-color: #ffffff !important;
   color: #2d3748 !important;
-  border-color: #1e3a5f !important;
-  box-shadow: 0 0 0 0.2rem rgba(30, 58, 95, 0.25) !important;
+  border-color: var(--huerto-secondary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(82, 183, 136, 0.25) !important;
 }
 
 .modal-body input::placeholder {
