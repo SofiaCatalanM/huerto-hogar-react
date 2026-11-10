@@ -1,4 +1,11 @@
 import React, { useState } from 'react';
+import { 
+  esCorreoValido, 
+  esTarjetaValida, 
+  esCVVValido, 
+  esExpiracionValida, 
+  formatoCLP 
+} from '../utils/validaciones.js';
 
 const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
   const [formData, setFormData] = useState({
@@ -20,16 +27,14 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // 1. Bloqueo estricto en tiempo de escritura para el Nombre:
-    // Elimina cualquier dígito numérico si intentan escribirlo
+    // 1. Bloqueo en tiempo real: Elimina números en el nombre
     if (name === 'nombre') {
       const soloLetras = value.replace(/[0-9]/g, '');
       setFormData((prev) => ({ ...prev, [name]: soloLetras }));
       return;
     }
 
-    // 2. Bloqueo estricto en tiempo de escritura para Tarjeta y CVV:
-    // Elimina cualquier letra o carácter especial si intentan escribirlo
+    // 2. Bloqueo en tiempo real: Elimina letras en Tarjeta y CVV
     if (name === 'numeroTarjeta' || name === 'cvv') {
       const soloNumeros = value.replace(/\D/g, ''); 
       setFormData((prev) => ({ ...prev, [name]: soloNumeros }));
@@ -44,39 +49,42 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
     e.stopPropagation();
     setErrorMsg('');
 
-    // Validar Nombre: No debe tener números ni estar vacío
-    if (!formData.nombre.trim() || /\d/.test(formData.nombre)) {
-      setErrorMsg('El nombre no puede incluir números ni estar vacío.');
+    // Validar nombre (mínimo 3 caracteres y sin números)
+    if (!formData.nombre.trim() || formData.nombre.trim().length < 3 || /\d/.test(formData.nombre)) {
+      setErrorMsg('Por favor ingresa un nombre válido (solo letras, mín. 3 caracteres).');
       return;
     }
 
-    // Validar Dirección y Comuna
+    // Validar correo usando la función importada
+    if (!esCorreoValido(formData.email)) {
+      setErrorMsg('Ingresa un correo electrónico válido (ej: @duoc.cl, @gmail.com).');
+      return;
+    }
+
     if (!formData.direccion.trim() || !formData.comuna.trim()) {
-      setErrorMsg('Por favor completa la dirección y comuna de envío.');
+      setErrorMsg('Por favor ingresa tu dirección y comuna de despacho.');
       return;
     }
 
-    // Validar Tarjeta si el método es tarjeta
+    // Validaciones estrictas si el pago es con tarjeta
     if (formData.metodoPago === 'tarjeta') {
-      // Verificar que solo contenga números y tenga exactamente 16 dígitos
-      if (!/^\d{16}$/.test(formData.numeroTarjeta)) {
-        setErrorMsg('El número de tarjeta debe tener exactamente 16 dígitos (sin letras).');
+      if (!esTarjetaValida(formData.numeroTarjeta)) {
+        setErrorMsg('El número de tarjeta debe tener exactamente 16 dígitos numéricos (sin letras).');
         return;
       }
 
-      if (!formData.expiracion.trim()) {
-        setErrorMsg('Por favor ingresa la fecha de expiración.');
+      if (!esExpiracionValida(formData.expiracion)) {
+        setErrorMsg('La fecha de expiración debe tener el formato válido MM/AA (ej: 12/28).');
         return;
       }
 
-      // Verificar que el CVV tenga 3 o 4 dígitos estrictamente numéricos
-      if (!/^\d{3,4}$/.test(formData.cvv)) {
+      if (!esCVVValido(formData.cvv)) {
         setErrorMsg('El código CVV debe tener 3 o 4 dígitos numéricos.');
         return;
       }
     }
 
-    // Si pasa todas las validaciones
+    // Si pasa todas las validaciones de forma estricta:
     setOrderSuccess(true);
     setTimeout(() => {
       onCompleteOrder();
@@ -109,7 +117,7 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
         <form onSubmit={handleSubmit} noValidate>
           <div className="row g-3">
             <div className="col-12">
-              <label htmlFor="nombre" className="form-label fw-semibold">Nombre Completo (Sin números)</label>
+              <label htmlFor="nombre" className="form-label fw-semibold">Nombre Completo (Solo letras)</label>
               <input 
                 type="text" 
                 className="form-control" 
@@ -194,7 +202,7 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
           {formData.metodoPago === 'tarjeta' && (
             <div className="row g-3 p-3 bg-light rounded border mb-4">
               <div className="col-12">
-                <label htmlFor="numeroTarjeta" className="form-label fw-semibold">Número de Tarjeta (Solo números, 16 dígitos)</label>
+                <label htmlFor="numeroTarjeta" className="form-label fw-semibold">Número de Tarjeta (16 dígitos)</label>
                 <input 
                   type="text" 
                   maxLength="16"
@@ -207,19 +215,20 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                 />
               </div>
               <div className="col-sm-6">
-                <label htmlFor="expiracion" className="form-label fw-semibold">Expiración</label>
+                <label htmlFor="expiracion" className="form-label fw-semibold">Expiración (MM/AA)</label>
                 <input 
                   type="text" 
+                  maxLength="5"
                   className="form-control" 
                   id="expiracion" 
                   name="expiracion" 
                   value={formData.expiracion} 
                   onChange={handleChange} 
-                  placeholder="MM/AA"
+                  placeholder="12/28"
                 />
               </div>
               <div className="col-sm-6">
-                <label htmlFor="cvv" className="form-label fw-semibold">CVV (Solo números)</label>
+                <label htmlFor="cvv" className="form-label fw-semibold">CVV</label>
                 <input 
                   type="text" 
                   maxLength="4"
@@ -263,12 +272,12 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                   <h6 className="my-0">{item.name || item.nombre}</h6>
                   <small className="text-muted">{item.category || item.categoria} {item.cantidad ? `(x${item.cantidad})` : ''}</small>
                 </div>
-                <span className="text-muted">${((item.price) * (item.cantidad || 1)).toLocaleString('es-CL')}</span>
+                <span className="text-muted">{formatoCLP((item.price) * (item.cantidad || 1))}</span>
               </li>
             ))}
             <li className="list-group-item d-flex justify-content-between bg-light fw-bold fs-5">
               <span>Total (CLP)</span>
-              <strong className="text-success">${total.toLocaleString('es-CL')}</strong>
+              <strong className="text-success">{formatoCLP(total)}</strong>
             </li>
           </ul>
         </div>

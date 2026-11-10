@@ -1,3 +1,5 @@
+// src/utils/validaciones.js
+
 export const esCorreoValido = (c) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c) &&
   ['@duoc.cl', '@profesor.duoc.cl', '@gmail.com'].some((d) => c.toLowerCase().endsWith(d))
@@ -27,13 +29,11 @@ export function validarRUN(runEntrada) {
 
 export const formatoCLP = (n) => `$${Number(n).toLocaleString('es-CL')}`
 
-// Valida que el número de tarjeta tenga exactamente 16 dígitos numéricos (ignora espacios)
+// Validaciones de medios de pago
 export const esTarjetaValida = (tarjeta) => /^\d{16}$/.test(String(tarjeta).replace(/\s/g, ''))
 
-// Valida que el código CVV tenga estrictamente 3 o 4 dígitos numéricos
 export const esCVVValido = (cvv) => /^\d{3,4}$/.test(String(cvv))
 
-// Valida formato de fecha de expiración (MM/AA o MM/YY)
 export const esExpiracionValida = (exp) => {
   const regex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/
   return regex.test(String(exp))
