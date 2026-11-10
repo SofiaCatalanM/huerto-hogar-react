@@ -1,16 +1,39 @@
-# React + Vite
+# HuertoHogar – Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Cómo correrlo
+```bash
+npm install
+npm run dev      # http://localhost:5173
+```
 
-Currently, two official plugins are available:
+## Estructura
+```
+huerto-hogar-react/
+├── index.html            ← en la RAÍZ; contiene <div id="root"> y carga /src/main.jsx
+├── package.json
+├── vite.config.js
+├── public/img/           ← imágenes (se usan como "/img/archivo.jpg")
+└── src/
+    ├── main.jsx          ← punto de entrada (Router + CartProvider + CSS)
+    ├── App.jsx           ← definición de rutas
+    ├── styles/styles.css ← tu css original
+    ├── components/       ← Navbar, Footer, Layout, Modal, ProductCard
+    ├── context/          ← CartContext (carrito global, reemplaza cart.js)
+    ├── data/             ← productos, blogs, tiendas, regiones
+    ├── pages/            ← una página por cada .html original
+    └── utils/            ← validaciones y helpers de localStorage
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Equivalencias HTML → React
+| Antes                 | Ahora                      | Ruta              |
+|-----------------------|----------------------------|-------------------|
+| index.html + main.js  | pages/Home.jsx             | /                 |
+| carrito.html + cart.js| pages/Carrito.jsx          | /carrito          |
+| blogs.html            | pages/Blogs.jsx            | /blogs            |
+| nosotros.html         | pages/Nosotros.jsx         | /nosotros         |
+| login.html            | pages/Login.jsx            | /login            |
+| registro.html         | pages/Registro.jsx         | /registro         |
+| admin-home.html       | pages/AdminHome.jsx        | /admin            |
+| admin-productos.html  | pages/AdminProductos.jsx   | /admin/productos  |
+| admin-usuarios.html   | pages/AdminUsuarios.jsx    | /admin/usuarios   |
+| mensajes.html         | pages/Mensajes.jsx         | /admin/mensajes   |
