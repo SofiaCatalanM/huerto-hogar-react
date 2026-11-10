@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
-  // Estado local para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -16,69 +15,68 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Calcular el total considerando la cantidad
   const total = cart.reduce((acc, item) => acc + (item.price * (item.cantidad || 1)), 0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Validación estricta para el Nombre: Solo letras y espacios (sin números)
+    // 1. Bloqueo estricto en tiempo de escritura para el Nombre:
+    // Elimina cualquier dígito numérico si intentan escribirlo
     if (name === 'nombre') {
-      const soloLetras = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+      const soloLetras = value.replace(/[0-9]/g, '');
       setFormData((prev) => ({ ...prev, [name]: soloLetras }));
       return;
     }
 
-    // Validación estricta para el Número de Tarjeta y CVV: Solo números (sin letras/strings)
+    // 2. Bloqueo estricto en tiempo de escritura para Tarjeta y CVV:
+    // Elimina cualquier letra o carácter especial si intentan escribirlo
     if (name === 'numeroTarjeta' || name === 'cvv') {
       const soloNumeros = value.replace(/\D/g, ''); 
       setFormData((prev) => ({ ...prev, [name]: soloNumeros }));
       return;
     }
 
-    // Para los demás campos
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // ¡Evita que la página se recargue!
+    e.preventDefault();
+    e.stopPropagation();
     setErrorMsg('');
 
-    // Validar Nombre vacío o muy corto
-    if (!formData.nombre.trim() || formData.nombre.trim().length < 3) {
-      setErrorMsg('Por favor, ingresa un nombre completo válido (solo letras).');
-      return;
-    }
-
-    // Validar Email básico
-    if (!formData.email.includes('@') || !formData.email.includes('.')) {
-      setErrorMsg('Por favor, ingresa un correo electrónico válido.');
+    // Validar Nombre: No debe tener números ni estar vacío
+    if (!formData.nombre.trim() || /\d/.test(formData.nombre)) {
+      setErrorMsg('El nombre no puede incluir números ni estar vacío.');
       return;
     }
 
     // Validar Dirección y Comuna
     if (!formData.direccion.trim() || !formData.comuna.trim()) {
-      setErrorMsg('Por favor, completa la dirección y la comuna de despacho.');
+      setErrorMsg('Por favor completa la dirección y comuna de envío.');
       return;
     }
 
-    // Validaciones específicas si paga con tarjeta
+    // Validar Tarjeta si el método es tarjeta
     if (formData.metodoPago === 'tarjeta') {
-      if (formData.numeroTarjeta.length < 16) {
-        setErrorMsg('El número de tarjeta debe tener exactamente 16 dígitos numéricos.');
+      // Verificar que solo contenga números y tenga exactamente 16 dígitos
+      if (!/^\d{16}$/.test(formData.numeroTarjeta)) {
+        setErrorMsg('El número de tarjeta debe tener exactamente 16 dígitos (sin letras).');
         return;
       }
+
       if (!formData.expiracion.trim()) {
-        setErrorMsg('Por favor, ingresa la fecha de expiración de la tarjeta.');
+        setErrorMsg('Por favor ingresa la fecha de expiración.');
         return;
       }
-      if (formData.cvv.length < 3) {
-        setErrorMsg('El CVV debe tener al menos 3 dígitos numéricos.');
+
+      // Verificar que el CVV tenga 3 o 4 dígitos estrictamente numéricos
+      if (!/^\d{3,4}$/.test(formData.cvv)) {
+        setErrorMsg('El código CVV debe tener 3 o 4 dígitos numéricos.');
         return;
       }
     }
 
-    // Si pasa todas las validaciones, procesar éxito
+    // Si pasa todas las validaciones
     setOrderSuccess(true);
     setTimeout(() => {
       onCompleteOrder();
@@ -99,22 +97,19 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
 
   return (
     <div className="row g-5">
-      {/* Columna Izquierda: Formulario de Despacho y Pago */}
       <div className="col-md-7 col-lg-8">
         <h4 className="mb-3 fw-bold">Datos de Envío y Pago</h4>
 
-        {/* Alerta de error visual en color rojo si falla alguna validación */}
         {errorMsg && (
           <div className="alert alert-danger py-2 fw-semibold shadow-sm" role="alert">
             ⚠️ {errorMsg}
           </div>
         )}
 
-        {/* Usamos noValidate para anular las validaciones nativas del navegador y delegarlas 100% en handleSubmit */}
         <form onSubmit={handleSubmit} noValidate>
           <div className="row g-3">
             <div className="col-12">
-              <label htmlFor="nombre" className="form-label fw-semibold">Nombre Completo (Solo letras)</label>
+              <label htmlFor="nombre" className="form-label fw-semibold">Nombre Completo (Sin números)</label>
               <input 
                 type="text" 
                 className="form-control" 
@@ -196,14 +191,13 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
             </div>
           </div>
 
-          {/* Campos de Tarjeta si está seleccionada */}
           {formData.metodoPago === 'tarjeta' && (
             <div className="row g-3 p-3 bg-light rounded border mb-4">
               <div className="col-12">
                 <label htmlFor="numeroTarjeta" className="form-label fw-semibold">Número de Tarjeta (Solo números, 16 dígitos)</label>
                 <input 
                   type="text" 
-                  maxLength="19"
+                  maxLength="16"
                   className="form-control" 
                   id="numeroTarjeta" 
                   name="numeroTarjeta" 
@@ -257,7 +251,6 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
         </form>
       </div>
 
-      {/* Columna Derecha: Resumen del Pedido */}
       <div className="col-md-5 col-lg-4">
         <div className="card shadow-sm border-0">
           <div className="card-header bg-dark text-white fw-bold">
