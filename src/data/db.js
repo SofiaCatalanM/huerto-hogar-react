@@ -44,11 +44,11 @@ let categorias = [
 
 let ordenes = [
   {
-    id: 1, usuarioId: 1, usuarioNombre: 'Juan Pérez', fecha: '2024-11-07', total: 15400, estado: 'pendiente',
+    id: 1, usuarioId: 1, usuarioNombre: 'Juan Pérez', fecha: '2026-11-09', total: 15400, estado: 'pendiente',
     productos: [{ nombre: 'Manzanas Fuji', cantidad: 5, subtotal: 6000 }, { nombre: 'Zanahorias Orgánicas', cantidad: 10, subtotal: 9000 }]
   },
   {
-    id: 2, usuarioId: 2, usuarioNombre: 'María González', fecha: '2024-11-08', total: 3000, estado: 'entregado',
+    id: 2, usuarioId: 2, usuarioNombre: 'María González', fecha: '2026-11-08', total: 3000, estado: 'entregado',
     productos: [{ nombre: 'Leche Entera', cantidad: 2, subtotal: 3000 }]
   }
 ];
