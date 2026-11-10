@@ -1,37 +1,50 @@
-
+/* Sidebar con el verde esmeralda oficial de Huerto Hogar */
 .sidebar-admin {
-  background-color: var(--emerald-green) !important;
+  background-color: #2E8B57 !important;
+  min-height: 100vh;
 }
 
 .sidebar-admin .nav-link {
   color: rgba(255, 255, 255, 0.8) !important;
+  margin-bottom: 4px;
 }
 
-.sidebar-admin .nav-link.active,
 .sidebar-admin .nav-link:hover {
   color: #ffffff !important;
-  background-color: rgba(0, 0, 0, 0.2) !important;
+  background-color: rgba(0, 0, 0, 0.15) !important;
   border-radius: 5px;
 }
 
+.sidebar-admin .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  border-radius: 5px;
+  font-weight: bold;
+}
 
+/* Botones principales del admin */
 .btn-huerto {
-  background-color: var(--emerald-green) !important;
+  background-color: #2E8B57 !important;
   color: #ffffff !important;
   border: none !important;
 }
 
 .btn-huerto:hover {
-  background-color: #246b43 !important; 
+  background-color: #246b43 !important;
   color: #ffffff !important;
 }
 
+/* Fondo general del panel */
+main.flex-grow-1 {
+  background-color: #F7F7F7 !important;
+}
 
+/* Títulos de modales con fondo verde */
 .modal-header {
-  background-color: var(--emerald-green) !important;
+  background-color: #2E8B57 !important;
   color: #ffffff !important;
 }
 
 .modal-header .btn-close {
-  filter: invert(1) grayscale(100%) brightness(200%); 
+  filter: invert(1) grayscale(100%) brightness(200%);
 }
