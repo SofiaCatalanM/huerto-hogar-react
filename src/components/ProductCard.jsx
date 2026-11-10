@@ -4,6 +4,14 @@ import { formatoCLP } from '../utils/validaciones.js'
 export default function ProductCard({ producto, onAgregar }) {
   const [cantidad, setCantidad] = useState(1)
 
+  const handleAgregar = () => {
+    // Aseguramos que la cantidad sea siempre un número entero válido (mínimo 1)
+    const cantidadNumerica = parseInt(cantidad, 10) || 1
+    onAgregar(producto, cantidadNumerica)
+    // Resetea el input a 1 después de agregar para una mejor experiencia de usuario
+    setCantidad(1)
+  }
+
   return (
     <div className="col-md-6 col-lg-4">
       <div className="card h-100 shadow-sm border-0">
@@ -21,10 +29,10 @@ export default function ProductCard({ producto, onAgregar }) {
               type="number"
               min="1"
               value={cantidad}
-              onChange={(e) => setCantidad(e.target.value)}
+              onChange={(e) => setCantidad(Math.max(1, parseInt(e.target.value, 10) || 1))}
               className="form-control form-control-sm w-25"
             />
-            <button className="btn btn-yellow btn-sm flex-grow-1" onClick={() => onAgregar(producto, parseInt(cantidad, 10) || 1)}>
+            <button className="btn btn-yellow btn-sm flex-grow-1" onClick={handleAgregar}>
               Agregar
             </button>
           </div>

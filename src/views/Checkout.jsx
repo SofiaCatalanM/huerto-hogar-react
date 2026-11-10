@@ -7,22 +7,78 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
     email: '',
     direccion: '',
     comuna: '',
-    metodoPago: 'tarjeta'
+    metodoPago: 'tarjeta',
+    numeroTarjeta: '',
+    expiracion: '',
+    cvv: ''
   });
 
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  // Calcular el total
-  const total = cart.reduce((acc, item) => acc + item.price, 0);
+  // Calcular el total considerando la cantidad
+  const total = cart.reduce((acc, item) => acc + (item.price * (item.cantidad || 1)), 0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Validación estricta para el Nombre: Solo letras y espacios (sin números)
+    if (name === 'nombre') {
+      const soloLetras = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+      setFormData((prev) => ({ ...prev, [name]: soloLetras }));
+      return;
+    }
+
+    // Validación estricta para el Número de Tarjeta y CVV: Solo números (sin letras/strings)
+    if (name === 'numeroTarjeta' || name === 'cvv') {
+      const soloNumeros = value.replace(/\D/g, ''); 
+      setFormData((prev) => ({ ...prev, [name]: soloNumeros }));
+      return;
+    }
+
+    // Para los demás campos
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    // Simular procesamiento de orden exitoso
+    e.preventDefault(); // ¡Evita que la página se recargue!
+    setErrorMsg('');
+
+    // Validar Nombre vacío o muy corto
+    if (!formData.nombre.trim() || formData.nombre.trim().length < 3) {
+      setErrorMsg('Por favor, ingresa un nombre completo válido (solo letras).');
+      return;
+    }
+
+    // Validar Email básico
+    if (!formData.email.includes('@') || !formData.email.includes('.')) {
+      setErrorMsg('Por favor, ingresa un correo electrónico válido.');
+      return;
+    }
+
+    // Validar Dirección y Comuna
+    if (!formData.direccion.trim() || !formData.comuna.trim()) {
+      setErrorMsg('Por favor, completa la dirección y la comuna de despacho.');
+      return;
+    }
+
+    // Validaciones específicas si paga con tarjeta
+    if (formData.metodoPago === 'tarjeta') {
+      if (formData.numeroTarjeta.length < 16) {
+        setErrorMsg('El número de tarjeta debe tener exactamente 16 dígitos numéricos.');
+        return;
+      }
+      if (!formData.expiracion.trim()) {
+        setErrorMsg('Por favor, ingresa la fecha de expiración de la tarjeta.');
+        return;
+      }
+      if (formData.cvv.length < 3) {
+        setErrorMsg('El CVV debe tener al menos 3 dígitos numéricos.');
+        return;
+      }
+    }
+
+    // Si pasa todas las validaciones, procesar éxito
     setOrderSuccess(true);
     setTimeout(() => {
       onCompleteOrder();
@@ -46,10 +102,19 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
       {/* Columna Izquierda: Formulario de Despacho y Pago */}
       <div className="col-md-7 col-lg-8">
         <h4 className="mb-3 fw-bold">Datos de Envío y Pago</h4>
-        <form onSubmit={handleSubmit} className="needs-validation">
+
+        {/* Alerta de error visual en color rojo si falla alguna validación */}
+        {errorMsg && (
+          <div className="alert alert-danger py-2 fw-semibold shadow-sm" role="alert">
+            ⚠️ {errorMsg}
+          </div>
+        )}
+
+        {/* Usamos noValidate para anular las validaciones nativas del navegador y delegarlas 100% en handleSubmit */}
+        <form onSubmit={handleSubmit} noValidate>
           <div className="row g-3">
             <div className="col-12">
-              <label htmlFor="nombre" className="form-label fw-semibold">Nombre Completo</label>
+              <label htmlFor="nombre" className="form-label fw-semibold">Nombre Completo (Solo letras)</label>
               <input 
                 type="text" 
                 className="form-control" 
@@ -57,7 +122,6 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                 name="nombre" 
                 value={formData.nombre} 
                 onChange={handleChange} 
-                required 
                 placeholder="Juan Pérez"
               />
             </div>
@@ -71,7 +135,6 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                 name="email" 
                 value={formData.email} 
                 onChange={handleChange} 
-                required 
                 placeholder="juan@ejemplo.com"
               />
             </div>
@@ -85,7 +148,6 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                 name="direccion" 
                 value={formData.direccion} 
                 onChange={handleChange} 
-                required 
                 placeholder="Av. Principal 123"
               />
             </div>
@@ -99,7 +161,6 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                 name="comuna" 
                 value={formData.comuna} 
                 onChange={handleChange} 
-                required 
                 placeholder="Santiago"
               />
             </div>
@@ -109,7 +170,7 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
 
           <h4 className="mb-3 fw-bold">Método de Pago</h4>
           <div className="my-3">
-            <div className="form-check">
+            <div className="form-check mb-2">
               <input 
                 id="tarjeta" 
                 name="metodoPago" 
@@ -134,6 +195,50 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
               <label className="form-check-label" htmlFor="transferencia">Transferencia Bancaria Directa</label>
             </div>
           </div>
+
+          {/* Campos de Tarjeta si está seleccionada */}
+          {formData.metodoPago === 'tarjeta' && (
+            <div className="row g-3 p-3 bg-light rounded border mb-4">
+              <div className="col-12">
+                <label htmlFor="numeroTarjeta" className="form-label fw-semibold">Número de Tarjeta (Solo números, 16 dígitos)</label>
+                <input 
+                  type="text" 
+                  maxLength="19"
+                  className="form-control" 
+                  id="numeroTarjeta" 
+                  name="numeroTarjeta" 
+                  value={formData.numeroTarjeta} 
+                  onChange={handleChange} 
+                  placeholder="4500123456789012"
+                />
+              </div>
+              <div className="col-sm-6">
+                <label htmlFor="expiracion" className="form-label fw-semibold">Expiración</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="expiracion" 
+                  name="expiracion" 
+                  value={formData.expiracion} 
+                  onChange={handleChange} 
+                  placeholder="MM/AA"
+                />
+              </div>
+              <div className="col-sm-6">
+                <label htmlFor="cvv" className="form-label fw-semibold">CVV (Solo números)</label>
+                <input 
+                  type="text" 
+                  maxLength="4"
+                  className="form-control" 
+                  id="cvv" 
+                  name="cvv" 
+                  value={formData.cvv} 
+                  onChange={handleChange} 
+                  placeholder="123"
+                />
+              </div>
+            </div>
+          )}
 
           <hr className="my-4" />
 
@@ -162,10 +267,10 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
             {cart.map((item, index) => (
               <li key={index} className="list-group-item d-flex justify-content-between lh-sm">
                 <div>
-                  <h6 className="my-0">{item.name}</h6>
-                  <small className="text-muted">{item.category}</small>
+                  <h6 className="my-0">{item.name || item.nombre}</h6>
+                  <small className="text-muted">{item.category || item.categoria} {item.cantidad ? `(x${item.cantidad})` : ''}</small>
                 </div>
-                <span className="text-muted">${item.price.toLocaleString('es-CL')}</span>
+                <span className="text-muted">${((item.price) * (item.cantidad || 1)).toLocaleString('es-CL')}</span>
               </li>
             ))}
             <li className="list-group-item d-flex justify-content-between bg-light fw-bold fs-5">
