@@ -1,13 +1,16 @@
 import React from 'react';
-import Sidebar from '../admin/Sidebar';
-import './admin-theme.css'; 
+import { Outlet } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import './admin-theme.css';
 
-function AdminLayout({ children }) {
+function AdminLayout() {
   return (
     <div className="d-flex">
       <Sidebar />
-      <main className="flex-grow-1 p-4 bg-light" style={{ minHeight: '100vh' }}>
-        {children}
+      <main className="flex-grow-1 p-4" style={{ minHeight: '100vh', backgroundColor: '#F7F7F7' }}>
+      
+        <Outlet />
+        
         <footer className="mt-5 pt-3 border-top text-muted text-center">
           <small>Panel de Administración HuertoHogar - Desarrollo Fullstack II</small>
         </footer>

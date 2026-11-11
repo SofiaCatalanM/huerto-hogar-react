@@ -1,59 +1,108 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { leer } from '../utils/storage.js'
-import { esCorreoValido, esPasswordValida } from '../utils/validaciones.js'
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { login } from '../data/db';
 
-export default function Login() {
-  const [correo, setCorreo] = useState('')
-  const [pass, setPass] = useState('')
-  const [mensaje, setMensaje] = useState(null)
-  const navigate = useNavigate()
+function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errores, setErrores] = useState({});
+  const navigate = useNavigate();
 
-  const errorCorreo = correo && !esCorreoValido(correo) ? 'Solo correos @duoc.cl, @profesor.duoc.cl o @gmail.com' : ''
-  const errorPass = pass && !esPasswordValida(pass) ? 'La contraseña debe tener entre 4 y 10 caracteres.' : ''
-  const valido = esCorreoValido(correo) && esPasswordValida(pass)
+  const validarFormulario = () => {
+    const nuevosErrores = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const ingresar = (e) => {
-    e.preventDefault()
-    const u = leer('usuarioHuertoHogar', null)
-    if (u && u.correo === correo && u.password === pass) {
-      setMensaje({ ok: true, texto: '¡Inicio de sesión correcto! Bienvenido.' })
-      setTimeout(() => navigate('/'), 1000)
-    } else {
-      setMensaje({ ok: false, texto: 'Credenciales incorrectas o usuario no registrado.' })
+    if (!emailRegex.test(email)) {
+      nuevosErrores.email = 'Ingresa un email valido con formato ejemplo@correo.com';
     }
-  }
+
+    if (password.length < 6) {
+      nuevosErrores.password = 'La contraseña debe tener al menos 6 caracteres';
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrores({});
+
+    if (validarFormulario()) {
+      const usuario = login(email, password);
+
+      if (usuario) {
+        localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+        if (usuario.tipo === 'administrador') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      } else {
+        setErrores({ general: 'Email o contraseña incorrectos' });
+      }
+    }
+  };
 
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card shadow">
-            <div className="card-body p-5">
-              <h2 className="text-center mb-4">Bienvenido a Huerto Hogar</h2>
-              <form onSubmit={ingresar}>
-                <div className="mb-3">
-                  <label className="form-label">Correo Electrónico:</label>
-                  <input type="email" className="form-control" placeholder="ejemplo@duoc.cl" autoComplete="username" value={correo} onChange={(e) => setCorreo(e.target.value)} />
-                  <span className="text-danger small">{errorCorreo}</span>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Contraseña:</label>
-                  <input type="password" className="form-control" placeholder="Entre 4 y 10 caracteres" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} />
-                  <span className="text-danger small">{errorPass}</span>
-                </div>
-                {mensaje && <div className={`small fw-bold ${mensaje.ok ? 'text-success' : 'text-danger'}`}>{mensaje.texto}</div>}
-                <div className="d-grid gap-2 mt-4">
-                  <button type="submit" className="btn btn-success" disabled={!valido}>Ingresar</button>
-                </div>
-              </form>
+            <div className="card-header text-white" style={{ backgroundColor: '#2E8B57' }}>
+              <h3 className="mb-0">Iniciar Sesion</h3>
             </div>
-            <p className="text-center mt-3 text-muted">
-              ¿Aún no tienes cuenta? <Link to="/registro" className="text-success text-decoration-none fw-bold">Regístrate aquí</Link>
-            </p>
+            <div className="card-body">
+              {errores.general && (
+                <div className="alert alert-danger" role="alert">
+                  {errores.general}
+                </div>
+              )}
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">Email</label>
+                  <input
+                    type="email"
+                    className={`form-control ${errores.email ? 'is-invalid' : ''}`}
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ejemplo@correo.com"
+                    required
+                  />
+                  {errores.email && <div className="invalid-feedback">{errores.email}</div>}
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">Contraseña</label>
+                  <input
+                    type="password"
+                    className={`form-control ${errores.password ? 'is-invalid' : ''}`}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Minimo 6 caracteres"
+                    required
+                  />
+                  {errores.password && <div className="invalid-feedback">{errores.password}</div>}
+                </div>
+                <button type="submit" className="btn w-100 text-white" style={{ backgroundColor: '#2E8B57' }}>
+                  Iniciar Sesion
+                </button>
+              </form>
+              <div className="mt-3 text-center">
+                <p className="mb-0">
+                  No tienes cuenta?{' '}
+                  <Link to="/registro" className="fw-bold" style={{ color: '#2E8B57' }}>
+                    Registrate aqui
+                  </Link>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
+
+export default Login;
