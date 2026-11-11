@@ -1,10 +1,55 @@
-# HuertoHogar – Frontend (React + Vite)
+# HuertoHogar - Tienda Online Frontend
 
-## Cómo correrlo
-```bash
-npm install
-npm run dev      # http://localhost:5173
-```
+Proyecto de la asignatura DSY1104 Desarrollo Fullstack II, Duoc UC.
+Plataforma web e-commerce para la venta de productos agricolas, migrada a React.
+
+## Integrantes
+- Ariel Ulloa
+- Ashley Garrido
+- Sofia Catalan
+
+## Tecnologias Utilizadas
+- React 18
+- Vite
+- React Router 6
+- Bootstrap 5
+- Vitest y React Testing Library
+- LocalStorage para persistencia de datos simulada
+
+## Instalacion y Ejecucion
+
+1. Clonar el repositorio.
+2. Instalar las dependencias del proyecto:
+   npm install
+3. Iniciar el servidor de desarrollo:
+   npm run dev
+4. Generar la version de produccion:
+   npm run build
+
+## Pruebas Unitarias y Cobertura
+
+Ejecutar el suite de pruebas:
+npm run test
+
+Generar el reporte de cobertura de codigo:
+npm run coverage
+
+## Credenciales de Prueba para el Panel Administrativo
+
+Para acceder al panel de administracion, utilice las siguientes credenciales de prueba cargadas en la base de datos simulada:
+
+Correo: maria@example.com
+Contrasena: 123456
+
+## Arquitectura del Proyecto
+
+El codigo fuente se organiza en la carpeta src de la siguiente manera:
+
+- components: Componentes reutilizables de la interfaz (Navbar, Footer, Layout, AdminLayout, modales).
+- pages: Vistas principales de la tienda publica y del panel de administracion.
+- context: Manejo del estado global, especificamente el carrito de compras.
+- data: Capa de abstraccion de datos (db.js) que simula operaciones CRUD sobre LocalStorage.
+- utils: Funciones de validacion de formularios y calculos de precios.
 
 ## Estructura
 ```

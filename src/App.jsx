@@ -1,19 +1,30 @@
-import { Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout.jsx'
-import Home from './pages/Home.jsx'
-import Carrito from './pages/Carrito.jsx'
-import Blogs from './pages/Blogs.jsx'
-import Nosotros from './pages/Nosotros.jsx'
-import Login from './pages/Login.jsx'
-import Registro from './pages/Registro.jsx'
-import AdminHome from './pages/AdminHome.jsx'
-import AdminProductos from './pages/AdminProductos.jsx'
-import AdminUsuarios from './pages/AdminUsuarios.jsx'
-import Mensajes from './pages/Mensajes.jsx'
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+// Layouts
+import Layout from './components/Layout.jsx';
+import AdminLayout from './components/admin/AdminLayout.jsx';
+import ProtectedRoute from './components/admin/ProtectedRoute.jsx';
+
+// Vistas publicas
+import Home from './pages/Home.jsx';
+import Carrito from './pages/Carrito.jsx';
+import Blogs from './pages/Blogs.jsx';
+import Nosotros from './pages/Nosotros.jsx';
+import Login from './pages/Login.jsx';
+import Registro from './pages/Registro.jsx';
+
+// Vistas del Panel Administrativo
+import Dashboard from './pages/admin/Dashboard.jsx';
+import Users from './pages/admin/Users.jsx';
+import Productos from './pages/admin/Productos.jsx';
+import Categorias from './pages/admin/Categorias.jsx';
+import Ordenes from './pages/admin/Ordenes.jsx';
+import PerfilAdmin from './pages/admin/PerfilAdmin.jsx';
 
 export default function App() {
   return (
     <Routes>
+      {/* Rutas Publicas (Tienda) */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/carrito" element={<Carrito />} />
@@ -21,12 +32,24 @@ export default function App() {
         <Route path="/nosotros" element={<Nosotros />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/admin" element={<AdminHome />} />
-        <Route path="/admin/productos" element={<AdminProductos />} />
-        <Route path="/admin/usuarios" element={<AdminUsuarios />} />
-        <Route path="/admin/mensajes" element={<Mensajes />} />
-        <Route path="*" element={<div className="container py-5"><h2>Página no encontrada</h2></div>} />
       </Route>
+
+      {/* Rutas del Panel Administrativo (Protegidas) */}
+      <Route path="/admin" element={
+        <ProtectedRoute>
+          <AdminLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<Dashboard />} />
+        <Route path="usuarios" element={<Users />} />
+        <Route path="productos" element={<Productos />} />
+        <Route path="categorias" element={<Categorias />} />
+        <Route path="ordenes" element={<Ordenes />} />
+        <Route path="perfil" element={<PerfilAdmin />} />
+      </Route>
+
+      {/* Redireccion para rutas no encontradas */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  )
+  );
 }

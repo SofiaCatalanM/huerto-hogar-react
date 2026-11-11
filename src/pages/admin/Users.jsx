@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import AdminLayout from '../../components/admin/AdminLayout';
 import UserForm from '../../components/admin/UserForm';
 import { obtenerUsuarios, crearUsuario, actualizarUsuario, eliminarUsuario } from '../../data/db';
 
@@ -51,7 +50,7 @@ function Users() {
   };
 
   return (
-    <AdminLayout>
+    <>
       {/* Contenido principal de la página */}
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 className="h2">Gestión de Usuarios</h1>
@@ -154,7 +153,7 @@ function Users() {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </>
   );
 }
 

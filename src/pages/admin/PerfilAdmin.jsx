@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AdminLayout from '../../components/admin/AdminLayout';
 import { obtenerUsuarioPorId, actualizarUsuario } from '../../data/db';
 
 function Profile() {
@@ -57,16 +56,16 @@ function Profile() {
 
   if (!usuario) {
     return (
-      <AdminLayout>
+      <>
         <div className="text-center mt-5">
           <p>Cargando perfil...</p>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout>
+    <>
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 className="h2">Mi Perfil</h1>
       </div>
@@ -138,7 +137,7 @@ function Profile() {
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 

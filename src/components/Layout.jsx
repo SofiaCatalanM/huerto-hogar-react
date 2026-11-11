@@ -8,7 +8,6 @@ export default function Layout() {
   const { toast, cerrarToast } = useCart()
   const { pathname } = useLocation()
 
-  // Corrección: El useEffect debe tener llaves {} y no devolver nada implícitamente
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [pathname])
@@ -27,19 +26,12 @@ export default function Layout() {
             <div className="d-flex">
               <div className="toast-body d-flex align-items-center justify-content-between w-100 gap-3">
                 <div>
-                  <span className="fw-bold text-warning d-block">¡Añadido al carrito! 🛒</span>
+                  <span className="fw-bold text-warning d-block">Añadido al carrito</span>
                   <span className="small text-light">{toast}</span>
                 </div>
-                <Link to="/carrito" className="btn btn-yellow btn-sm fw-bold text-nowrap" onClick={cerrarToast}>
-                  Ver Carrito →
-                </Link>
+                <Link to="/carrito" className="btn btn-yellow btn-sm fw-bold text-nowrap" onClick={cerrarToast}>Ver Carrito</Link>
               </div>
-              <button 
-                type="button" 
-                className="btn-close btn-close-white me-2 m-auto" 
-                onClick={cerrarToast} 
-                aria-label="Cerrar"
-              ></button>
+              <button type="button" className="btn-close btn-close-white me-2 m-auto" onClick={cerrarToast} aria-label="Cerrar"></button>
             </div>
           </div>
         </div>
