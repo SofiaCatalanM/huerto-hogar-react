@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
+import { 
+  esCorreoValido, 
+  esTarjetaValida, 
+  esCVVValido, 
+  esExpiracionValida, 
+  formatoCLP 
+} from '../utils/validaciones.js';
 
 const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
-  // Estado local para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -16,69 +22,69 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Calcular el total considerando la cantidad
   const total = cart.reduce((acc, item) => acc + (item.price * (item.cantidad || 1)), 0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Validación estricta para el Nombre: Solo letras y espacios (sin números)
+    // 1. Bloqueo en tiempo real: Elimina números en el nombre
     if (name === 'nombre') {
-      const soloLetras = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+      const soloLetras = value.replace(/[0-9]/g, '');
       setFormData((prev) => ({ ...prev, [name]: soloLetras }));
       return;
     }
 
-    // Validación estricta para el Número de Tarjeta y CVV: Solo números (sin letras/strings)
+    // 2. Bloqueo en tiempo real: Elimina letras en Tarjeta y CVV
     if (name === 'numeroTarjeta' || name === 'cvv') {
       const soloNumeros = value.replace(/\D/g, ''); 
       setFormData((prev) => ({ ...prev, [name]: soloNumeros }));
       return;
     }
 
-    // Para los demás campos
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // ¡Evita que la página se recargue!
+    e.preventDefault();
+    e.stopPropagation();
     setErrorMsg('');
 
-    // Validar Nombre vacío o muy corto
-    if (!formData.nombre.trim() || formData.nombre.trim().length < 3) {
-      setErrorMsg('Por favor, ingresa un nombre completo válido (solo letras).');
+    // Validar nombre (mínimo 3 caracteres y sin números)
+    if (!formData.nombre.trim() || formData.nombre.trim().length < 3 || /\d/.test(formData.nombre)) {
+      setErrorMsg('Por favor ingresa un nombre válido (solo letras, mín. 3 caracteres).');
       return;
     }
 
-    // Validar Email básico
-    if (!formData.email.includes('@') || !formData.email.includes('.')) {
-      setErrorMsg('Por favor, ingresa un correo electrónico válido.');
+    // Validar correo usando la función importada
+    if (!esCorreoValido(formData.email)) {
+      setErrorMsg('Ingresa un correo electrónico válido (ej: @duoc.cl, @gmail.com).');
       return;
     }
 
-    // Validar Dirección y Comuna
     if (!formData.direccion.trim() || !formData.comuna.trim()) {
-      setErrorMsg('Por favor, completa la dirección y la comuna de despacho.');
+      setErrorMsg('Por favor ingresa tu dirección y comuna de despacho.');
       return;
     }
 
-    // Validaciones específicas si paga con tarjeta
+    // Validaciones estrictas si el pago es con tarjeta
     if (formData.metodoPago === 'tarjeta') {
-      if (formData.numeroTarjeta.length < 16) {
-        setErrorMsg('El número de tarjeta debe tener exactamente 16 dígitos numéricos.');
+      if (!esTarjetaValida(formData.numeroTarjeta)) {
+        setErrorMsg('El número de tarjeta debe tener exactamente 16 dígitos numéricos (sin letras).');
         return;
       }
-      if (!formData.expiracion.trim()) {
-        setErrorMsg('Por favor, ingresa la fecha de expiración de la tarjeta.');
+
+      if (!esExpiracionValida(formData.expiracion)) {
+        setErrorMsg('La fecha de expiración debe tener el formato válido MM/AA (ej: 12/28).');
         return;
       }
-      if (formData.cvv.length < 3) {
-        setErrorMsg('El CVV debe tener al menos 3 dígitos numéricos.');
+
+      if (!esCVVValido(formData.cvv)) {
+        setErrorMsg('El código CVV debe tener 3 o 4 dígitos numéricos.');
         return;
       }
     }
 
-    // Si pasa todas las validaciones, procesar éxito
+    // Si pasa todas las validaciones de forma estricta:
     setOrderSuccess(true);
     setTimeout(() => {
       onCompleteOrder();
@@ -99,18 +105,15 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
 
   return (
     <div className="row g-5">
-      {/* Columna Izquierda: Formulario de Despacho y Pago */}
       <div className="col-md-7 col-lg-8">
         <h4 className="mb-3 fw-bold">Datos de Envío y Pago</h4>
 
-        {/* Alerta de error visual en color rojo si falla alguna validación */}
         {errorMsg && (
           <div className="alert alert-danger py-2 fw-semibold shadow-sm" role="alert">
             ⚠️ {errorMsg}
           </div>
         )}
 
-        {/* Usamos noValidate para anular las validaciones nativas del navegador y delegarlas 100% en handleSubmit */}
         <form onSubmit={handleSubmit} noValidate>
           <div className="row g-3">
             <div className="col-12">
@@ -196,14 +199,13 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
             </div>
           </div>
 
-          {/* Campos de Tarjeta si está seleccionada */}
           {formData.metodoPago === 'tarjeta' && (
             <div className="row g-3 p-3 bg-light rounded border mb-4">
               <div className="col-12">
-                <label htmlFor="numeroTarjeta" className="form-label fw-semibold">Número de Tarjeta (Solo números, 16 dígitos)</label>
+                <label htmlFor="numeroTarjeta" className="form-label fw-semibold">Número de Tarjeta (16 dígitos)</label>
                 <input 
                   type="text" 
-                  maxLength="19"
+                  maxLength="16"
                   className="form-control" 
                   id="numeroTarjeta" 
                   name="numeroTarjeta" 
@@ -213,19 +215,20 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                 />
               </div>
               <div className="col-sm-6">
-                <label htmlFor="expiracion" className="form-label fw-semibold">Expiración</label>
+                <label htmlFor="expiracion" className="form-label fw-semibold">Expiración (MM/AA)</label>
                 <input 
                   type="text" 
+                  maxLength="5"
                   className="form-control" 
                   id="expiracion" 
                   name="expiracion" 
                   value={formData.expiracion} 
                   onChange={handleChange} 
-                  placeholder="MM/AA"
+                  placeholder="12/28"
                 />
               </div>
               <div className="col-sm-6">
-                <label htmlFor="cvv" className="form-label fw-semibold">CVV (Solo números)</label>
+                <label htmlFor="cvv" className="form-label fw-semibold">CVV</label>
                 <input 
                   type="text" 
                   maxLength="4"
@@ -257,7 +260,6 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
         </form>
       </div>
 
-      {/* Columna Derecha: Resumen del Pedido */}
       <div className="col-md-5 col-lg-4">
         <div className="card shadow-sm border-0">
           <div className="card-header bg-dark text-white fw-bold">
@@ -270,12 +272,12 @@ const Checkout = ({ cart, onBackToCatalog, onCompleteOrder }) => {
                   <h6 className="my-0">{item.name || item.nombre}</h6>
                   <small className="text-muted">{item.category || item.categoria} {item.cantidad ? `(x${item.cantidad})` : ''}</small>
                 </div>
-                <span className="text-muted">${((item.price) * (item.cantidad || 1)).toLocaleString('es-CL')}</span>
+                <span className="text-muted">{formatoCLP((item.price) * (item.cantidad || 1))}</span>
               </li>
             ))}
             <li className="list-group-item d-flex justify-content-between bg-light fw-bold fs-5">
               <span>Total (CLP)</span>
-              <strong className="text-success">${total.toLocaleString('es-CL')}</strong>
+              <strong className="text-success">{formatoCLP(total)}</strong>
             </li>
           </ul>
         </div>
